@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sport
+          POSTGRES_PASSWORD: sport
+          POSTGRES_DB: sport_erp
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U sport" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      # Unit + integration tests (embedded Postgres via PGlite)
+      - run: npm test
+      # Migrations must apply cleanly to a real PostgreSQL server
+      - name: Migrate + seed on PostgreSQL
+        env:
+          DATABASE_URL: postgres://sport:sport@localhost:5432/sport_erp
+        run: npm run db:seed
+      - name: Migrations are in sync with schema
+        working-directory: apps/api
+        run: |
+          npx drizzle-kit generate --name ci-check
+          if [ -n "$(git status --porcelain drizzle)" ]; then
+            echo "::error::Schema changed without a migration. Run npm run db:generate and commit it."
+            git status --porcelain drizzle
+            exit 1
+          fi
+      - run: npm run build

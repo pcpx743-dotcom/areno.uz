@@ -1,0 +1,16 @@
+{
+  "name": "sport-erp",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "db:generate": "npm run db:generate -w apps/api",
+    "db:migrate": "npm run db:migrate -w apps/api",
+    "db:seed": "npm run db:seed -w apps/api",
+    "test": "npm test -w apps/api",
+    "typecheck": "npm run typecheck --workspaces",
+    "build": "npm run build --workspaces"
+  }
+}

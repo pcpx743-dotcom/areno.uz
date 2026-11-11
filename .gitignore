@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.data/
+.env
+*.log
+coverage/
+backups/
+.env.production
+
+# Client data and private docs stay out of the (public) repo
+/*.xlsx
+/*.pdf
+/*.png
+*.xlsx

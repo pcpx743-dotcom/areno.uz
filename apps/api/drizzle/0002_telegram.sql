@@ -1,0 +1,2 @@
+ALTER TABLE "notifications" ADD COLUMN "next_attempt_at" timestamp with time zone;--> statement-breakpoint
+CREATE INDEX "notifications_queue_idx" ON "notifications" USING btree ("status","next_attempt_at");
